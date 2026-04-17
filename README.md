@@ -87,7 +87,13 @@ dotnet build
 dotnet run
 ```
 
-Swagger UI:
+## Run with Docker
+
+```bash
+docker compose up --build
+```
+
+## Swagger UI:
 
 ```text
 http://localhost:xxxx/swagger

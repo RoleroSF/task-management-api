@@ -73,6 +73,12 @@ dotnet build
 dotnet run
 ```
 
+## Запуск через Docker
+
+```bash
+docker compose up --build
+```
+
 Swagger:
 
 ```
