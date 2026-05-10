@@ -1,13 +1,13 @@
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
-using TaskManagementApi.Data;
 using TaskManagementApi.DTOs;
-using TaskManagementApi.Extensions;
-using TaskManagementApi.Helpers;
-using TaskManagementApi.Mappings;
-using TaskManagementApi.Models;
+using TaskManagementApi.Features.Tasks.Commands.CreateTask;
+using TaskManagementApi.Features.Tasks.Commands.DeleteTask;
+using TaskManagementApi.Features.Tasks.Commands.UpdateTask;
+using TaskManagementApi.Features.Tasks.Queries.GetTaskById;
+using TaskManagementApi.Features.Tasks.Queries.GetTasks;
 
 namespace TaskManagementApi.Controllers;
 
@@ -16,145 +16,56 @@ namespace TaskManagementApi.Controllers;
 [Route("api/[controller]")]
 public class TasksController : ControllerBase
 {
-    private readonly AppDbContext _context;
-    private readonly ICurrentUserService _currentUserService;
-    public TasksController(AppDbContext context, ICurrentUserService currentUserService)
+    private readonly ISender _sender;
+    public TasksController(ISender sender)
     {
-        _context = context;
-        _currentUserService = currentUserService;
+        _sender = sender;
     }
 
     [HttpGet]
-    public async Task<ActionResult<PagedResultDto<TaskResponseDto>>> GetAll([FromQuery] TaskQueryParametersDto queryParams)
+    public async Task<ActionResult<PagedResultDto<TaskResponseDto>>> GetAll([FromQuery] TaskQueryParametersDto queryParams, CancellationToken cancellationToken)
     {
-        var page = PaginationHelper.NormalizePage(queryParams.Page);
-        var pageSize = PaginationHelper.NormalizePageSize(queryParams.PageSize);
-
-        IQueryable<TaskItem> query = _context.Tasks.AsNoTracking();
-
-        if (!_currentUserService.IsInRole("admin"))
-        {
-            var currentUserId = _currentUserService.GetUserId();
-            query = query.Where(t => t.UserId == currentUserId);
-        }
-
-        query = query.ApplyFiltering(queryParams).ApplySorting(queryParams);
-
-        var totalCount = await query.CountAsync();
-
-        var tasks = await query
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .Select(TaskMapper.ToResponseDtoExpression)
-            .ToListAsync();
-
-        var result = new PagedResultDto<TaskResponseDto>
-        {
-            Items = tasks,
-            Page = page,
-            PageSize = pageSize,
-            TotalCount = totalCount,
-            TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
-        };
+        var result = await _sender.Send(new GetTasksQuery(queryParams), cancellationToken);
 
         return Ok(result);
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<TaskResponseDto>> GetById(int id)
+    public async Task<ActionResult<TaskResponseDto>> GetById(int id, CancellationToken cancellationToken)
     {
-        IQueryable<TaskItem> query = _context.Tasks.AsNoTracking();
+        var result = await _sender.Send(new GetTaskByIdQuery(id), cancellationToken);
 
-        if (!_currentUserService.IsInRole("admin"))
-        {
-            var currentUserId = _currentUserService.GetUserId();
-            query = query.Where(t => t.UserId == currentUserId);
-        }
-
-        var task = await query
-            .Where(t => t.Id == id)
-            .Select(t => new TaskResponseDto
-            {
-                Id = t.Id,
-                Title = t.Title,
-                Description = t.Description,
-                IsCompleted = t.IsCompleted,
-                CreatedAt = t.CreatedAt
-            })
-            .FirstOrDefaultAsync();
-
-        if (task is null)
+        if (result is null)
         {
             return NotFound();
         }
 
-        return Ok(task);
+        return Ok(result);
     }
 
     [HttpPost]
-    public async Task<ActionResult<TaskResponseDto>> Create(CreateTaskDto dto)
+    public async Task<ActionResult<TaskResponseDto>> Create(CreateTaskDto dto, CancellationToken cancellationToken)
     {
-        var currentUserId = _currentUserService.GetUserId();
+        var response = await _sender.Send(new CreateTaskCommand(dto), cancellationToken);
 
-        var task = new TaskItem
-        {
-            Title = dto.Title,
-            Description = dto.Description,
-            IsCompleted = false,
-            CreatedAt = DateTime.UtcNow,
-            UserId = currentUserId
-        };
-
-        _context.Tasks.Add(task);
-        await _context.SaveChangesAsync();
-
-        var response = TaskMapper.ToResponseDto(task);
-
-        return CreatedAtAction(nameof(GetById), new { id = task.Id }, response);
+        return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
     }
 
     [HttpPut("{id:int}")]
     public async Task<ActionResult<TaskResponseDto>> Update(int id, UpdateTaskDto dto)
     {
-        IQueryable<TaskItem> query = _context.Tasks.AsNoTracking();
+        var response = await _sender.Send(new UpdateTaskCommand(id, dto), CancellationToken.None);
 
-        if (!_currentUserService.IsInRole("admin"))
-        {
-            var currentUserId = _currentUserService.GetUserId();
-            query = query.Where(t => t.UserId == currentUserId);
-        }
-
-        var task = await query.FirstOrDefaultAsync(t => t.Id == id);
-
-        if (task is null) return NotFound();
-
-        task.Title = dto.Title;
-        task.Description = dto.Description;
-        task.IsCompleted = dto.IsCompleted;
-
-        await _context.SaveChangesAsync();
-
-        var response = TaskMapper.ToResponseDto(task);
+        if (response is null) return NotFound();
 
         return Ok(response);
     }
 
     [HttpDelete("{id:int}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
-        IQueryable<TaskItem> query = _context.Tasks.AsNoTracking();
-
-        if (!_currentUserService.IsInRole("admin"))
-        {
-            var currentUserId = _currentUserService.GetUserId();
-            query = query.Where(t => t.UserId == currentUserId);
-        }
-        var task = await query.FirstOrDefaultAsync(t => t.Id == id);
-
-        if (task is null) return NotFound();
-
-        _context.Tasks.Remove(task);
-        await _context.SaveChangesAsync();
+        var result = await _sender.Send(new DeleteTaskCommand(id), cancellationToken);
+        if (!result) return NotFound();
 
         return NoContent();
     }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using TaskManagementApi.Data;
 using TaskManagementApi.DTOs;
 using TaskManagementApi.Services.Interfaces;
 
