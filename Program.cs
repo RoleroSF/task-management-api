@@ -8,11 +8,6 @@ using Serilog;
 using System.Text;
 
 using TaskManagementApi.Data;
-using TaskManagementApi.Features.Tasks.Commands.CreateTask;
-using TaskManagementApi.Features.Tasks.Commands.DeleteTask;
-using TaskManagementApi.Features.Tasks.Commands.UpdateTask;
-using TaskManagementApi.Features.Tasks.Queries.GetTaskById;
-using TaskManagementApi.Features.Tasks.Queries.GetTasks;
 using TaskManagementApi.Middleware;
 using TaskManagementApi.Services;
 using TaskManagementApi.Services.Interfaces;
