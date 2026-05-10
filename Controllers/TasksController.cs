@@ -52,9 +52,9 @@ public class TasksController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    public async Task<ActionResult<TaskResponseDto>> Update(int id, UpdateTaskDto dto)
+    public async Task<ActionResult<TaskResponseDto>> Update(int id, UpdateTaskDto dto, CancellationToken cancellationToken)
     {
-        var response = await _sender.Send(new UpdateTaskCommand(id, dto), CancellationToken.None);
+        var response = await _sender.Send(new UpdateTaskCommand(id, dto), cancellationToken);
 
         if (response is null) return NotFound();
 

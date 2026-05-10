@@ -87,11 +87,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
-builder.Services.AddScoped<GetTasksQueryHandler>();
-builder.Services.AddScoped<GetTaskByIdQueryHandler>();
-builder.Services.AddScoped<CreateTaskCommandHandler>();
-builder.Services.AddScoped<UpdateTaskCommandHandler>();
-builder.Services.AddScoped<DeleteTaskCommandHandler>();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 
 var app = builder.Build();
 
