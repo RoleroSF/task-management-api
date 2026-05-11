@@ -26,6 +26,8 @@
     <Folder Include="Controllers\Queries\" />
     <Folder Include="Controllers\Commands\" />
     <Folder Include="Extensions\" />
+    <Folder Include="Features\Tasks\Commands\CompleteAllTasks\" />
+    <Folder Include="Features\Tasks\Commands\DeleteAllTasks\" />
   </ItemGroup>
 
 </Project>

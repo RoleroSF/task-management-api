@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using TaskManagementApi.DTOs;
+using TaskManagementApi.Features.Tasks.Commands.CompleteAllTasks;
 using TaskManagementApi.Features.Tasks.Commands.CreateTask;
+using TaskManagementApi.Features.Tasks.Commands.DeleteAllTasks;
 using TaskManagementApi.Features.Tasks.Commands.DeleteTask;
 using TaskManagementApi.Features.Tasks.Commands.UpdateTask;
 using TaskManagementApi.Features.Tasks.Queries.GetTaskById;
@@ -68,6 +70,20 @@ public class TasksController : ControllerBase
         if (!result) return NotFound();
 
         return NoContent();
+    }
+
+    [HttpPut]
+    public async Task<ActionResult<MassUpdatedTasksCountDTO>> CompleteAll(CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new CompleteAllTasksCommand(), cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpDelete]
+    public async Task<ActionResult<MassUpdatedTasksCountDTO>> DeleteAll(CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new DeleteAllTasksCommand(), cancellationToken);
+        return Ok(result);
     }
 
     [HttpGet("test-error")]
