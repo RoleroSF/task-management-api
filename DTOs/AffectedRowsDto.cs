@@ -1,6 +1,6 @@
 namespace TaskManagementApi.DTOs;
 
-public class MassUpdatedTasksCountDTO
+public class AffectedRowsDto
 {
     public int Count { get; set; }
 }

@@ -72,15 +72,15 @@ public class TasksController : ControllerBase
         return NoContent();
     }
 
-    [HttpPut]
-    public async Task<ActionResult<MassUpdatedTasksCountDTO>> CompleteAll(CancellationToken cancellationToken)
+    [HttpPut("complete-all")]
+    public async Task<ActionResult<AffectedRowsDto>> CompleteAll(CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new CompleteAllTasksCommand(), cancellationToken);
         return Ok(result);
     }
 
-    [HttpDelete]
-    public async Task<ActionResult<MassUpdatedTasksCountDTO>> DeleteAll(CancellationToken cancellationToken)
+    [HttpDelete("delete-all")]
+    public async Task<ActionResult<AffectedRowsDto>> DeleteAll(CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new DeleteAllTasksCommand(), cancellationToken);
         return Ok(result);

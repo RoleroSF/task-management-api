@@ -5,7 +5,7 @@ using TaskManagementApi.DTOs;
 
 namespace TaskManagementApi.Features.Tasks.Commands.CompleteAllTasks;
 
-public sealed class CompleteAllTasksCommandHandler : IRequestHandler<CompleteAllTasksCommand, MassUpdatedTasksCountDTO>
+public sealed class CompleteAllTasksCommandHandler : IRequestHandler<CompleteAllTasksCommand, AffectedRowsDto>
 {
     private readonly AppDbContext _context;
     private readonly ICurrentUserService _currentUserService;
@@ -14,7 +14,7 @@ public sealed class CompleteAllTasksCommandHandler : IRequestHandler<CompleteAll
         _context = context;
         _currentUserService = currentUserService;
     }
-    public async Task<MassUpdatedTasksCountDTO> Handle(CompleteAllTasksCommand command, CancellationToken cancellationToken)
+    public async Task<AffectedRowsDto> Handle(CompleteAllTasksCommand command, CancellationToken cancellationToken)
     {
         var currentUserId = _currentUserService.GetUserId();
 
@@ -22,6 +22,6 @@ public sealed class CompleteAllTasksCommandHandler : IRequestHandler<CompleteAll
                    .Where(x => x.UserId == currentUserId && x.IsCompleted == false)
                    .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.IsCompleted, true), cancellationToken);
 
-        return new MassUpdatedTasksCountDTO { Count = updatedCount };
+        return new AffectedRowsDto { Count = updatedCount };
     }
 }

@@ -5,7 +5,7 @@ using TaskManagementApi.Data;
 
 namespace TaskManagementApi.Features.Tasks.Commands.DeleteAllTasks;
 
-public class DeleteAllTasksCommandHandler : IRequestHandler<DeleteAllTasksCommand, MassUpdatedTasksCountDTO>
+public class DeleteAllTasksCommandHandler : IRequestHandler<DeleteAllTasksCommand, AffectedRowsDto>
 {
     private readonly AppDbContext _dbContext;
     private readonly ICurrentUserService _currentUserService;
@@ -14,7 +14,7 @@ public class DeleteAllTasksCommandHandler : IRequestHandler<DeleteAllTasksComman
         _dbContext = dbContext;
         _currentUserService = currentUserService;
     }
-    public async Task<MassUpdatedTasksCountDTO> Handle(DeleteAllTasksCommand request, CancellationToken cancellationToken)
+    public async Task<AffectedRowsDto> Handle(DeleteAllTasksCommand request, CancellationToken cancellationToken)
     {
         var currentUserId = _currentUserService.GetUserId();
        
@@ -22,6 +22,6 @@ public class DeleteAllTasksCommandHandler : IRequestHandler<DeleteAllTasksComman
             .Where(x => x.UserId == currentUserId)
             .ExecuteDeleteAsync(cancellationToken);
 
-        return new MassUpdatedTasksCountDTO { Count = result };
+        return new AffectedRowsDto { Count = result };
     }
 }
