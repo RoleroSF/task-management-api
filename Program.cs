@@ -8,12 +8,15 @@ using System.Text;
 
 using Serilog;
 using MediatR;
+using FluentValidation;
+using FluentValidation;
 
 using TaskManagementApi.Data;
 using TaskManagementApi.Middleware;
 using TaskManagementApi.Services;
 using TaskManagementApi.Services.Interfaces;
 using TaskManagementApi.Extensions;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,7 +75,10 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
+
+builder.Services.AddValidatorsFromAssemblyContaining<CreateTaskCommandValidator>();
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CreateTaskValidationBehavior<,>));
 
 builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(@"./keys"));
