@@ -1,22 +1,20 @@
+using System.Text;
+using FluentValidation;
+using MediatR;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 
-using System.Text;
-
 using Serilog;
-using MediatR;
-using FluentValidation;
-using FluentValidation;
 
 using TaskManagementApi.Data;
+using TaskManagementApi.Extensions;
 using TaskManagementApi.Middleware;
 using TaskManagementApi.Services;
 using TaskManagementApi.Services.Interfaces;
-using TaskManagementApi.Extensions;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
