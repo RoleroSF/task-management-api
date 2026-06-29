@@ -7,6 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\Commands\**" />
+    <Compile Remove="Controllers\Queries\**" />
+    <Content Remove="Controllers\Commands\**" />
+    <Content Remove="Controllers\Queries\**" />
+    <EmbeddedResource Remove="Controllers\Commands\**" />
+    <EmbeddedResource Remove="Controllers\Queries\**" />
+    <None Remove="Controllers\Commands\**" />
+    <None Remove="Controllers\Queries\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="MediatR" Version="14.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.5" />
@@ -23,9 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\Queries\" />
-    <Folder Include="Controllers\Commands\" />
-    <Folder Include="Extensions\" />
     <Folder Include="Features\Tasks\Commands\CompleteAllTasks\" />
     <Folder Include="Features\Tasks\Commands\DeleteAllTasks\" />
   </ItemGroup>
